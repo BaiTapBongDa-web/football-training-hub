@@ -130,10 +130,14 @@ mark{background:#facc15;color:#111827;padding:0 2px;border-radius:2px}
         .stat b { display:block; font-size:26px; color:#4ade80; }
         .stat span { font-size:12px; color:#cbd5e1; }
         .control-panel,.planner,.week-plan { margin-top:18px; background:rgba(8,25,18,.88); border:1px solid rgba(74,222,128,.15); border-radius:12px; padding:18px; box-shadow:0 8px 25px rgba(0,0,0,.15); }
-        .section-title { color:#86efac; font-weight:800; letter-spacing:.7px; margin-bottom:12px; }
+        .section-title { color:#ffffff !important; font-weight:800; letter-spacing:.7px; margin-bottom:12px; }
+        header h1, header .subtitle, header .badge, header .stats, header .stat { color:#ffffff !important; }
+        header .subtitle { color:#ffffff !important; }
         .quick-row { display:flex; flex-wrap:wrap; gap:8px; }
         .quick-row button,.card-actions button { border:1px solid #334155; background:#10251b; color:#e2e8f0; padding:8px 12px; border-radius:7px; cursor:pointer; font-weight:700; }
         .quick-row button:hover,.card-actions button:hover { border-color:#4ade80; transform:translateY(-1px); }
+        .quick-row .saved-btn { background:#3b1111; border-color:#7f1d1d; color:#fecaca; }
+        .quick-row .saved-btn:hover { background:#4c1717; border-color:#ef4444; }
         .quick-row .ghost { margin-left:auto; }
         .planner-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
         .planner-grid label { color:#cbd5e1; font-size:12px; font-weight:700; }
@@ -168,11 +172,85 @@ mark{background:#facc15;color:#111827;padding:0 2px;border-radius:2px}
         .fav-btn.active { background:#b91c1c; }
         .modal { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px; }
         .modal.show { display:flex; }
-        .modal-card { position:relative; max-width:700px; width:100%; max-height:85vh; overflow:auto; background:#f8fafc; border-radius:14px; padding:24px; }
-        .modal-close { position:absolute; right:15px; top:12px; border:0; background:#fee2e2; color:#991b1b; border-radius:50%; width:32px; height:32px; cursor:pointer; }
-        .pitch { margin:16px 0; height:180px; border:2px solid #166534; border-radius:8px; position:relative; background:repeating-linear-gradient(90deg,#14532d 0 45px,#166534 45px 90px); }
-        .pitch:before { content:""; position:absolute; left:50%; top:0; bottom:0; border-left:2px solid rgba(255,255,255,.7); }
-        .pitch:after { content:""; position:absolute; width:65px; height:65px; border:2px solid rgba(255,255,255,.7); border-radius:50%; left:calc(50% - 34px); top:calc(50% - 34px); }
+        .modal-card {
+            position:relative; max-width:760px; width:100%; max-height:85vh; overflow:auto;
+            background:#f8fafc; color:#0f172a; border-radius:14px; padding:24px;
+            box-shadow:0 25px 60px rgba(0,0,0,.35);
+        }
+        .modal-card h2,.modal-card h3 { color:#0f172a; }
+        .modal-card p,.modal-card li { color:#334155; }
+        .modal-card b { color:#0f172a; }
+        .modal-close { position:absolute; right:15px; top:12px; border:0; background:#fee2e2; color:#991b1b; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:16px; line-height:32px; }
+
+        /* Sơ đồ sân tương tác trong phần Chi tiết */
+        .pitch-wrap { margin:18px 0 10px; }
+        .pitch-label { margin:0 0 8px; font-size:13px; font-weight:700; color:#475569; }
+        .pitch-demo {
+            margin:0; height:210px; border:2px solid #166534; border-radius:10px; position:relative;
+            overflow:hidden; cursor:pointer; user-select:none; isolation:isolate;
+            background:repeating-linear-gradient(90deg,#14532d 0 45px,#166534 45px 90px);
+            box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+        }
+        .pitch-demo::before {
+            content:""; position:absolute; left:50%; top:0; bottom:0; border-left:2px solid rgba(255,255,255,.75);
+        }
+        .pitch-demo::after {
+            content:""; position:absolute; width:70px; height:70px; border:2px solid rgba(255,255,255,.75);
+            border-radius:50%; left:calc(50% - 37px); top:calc(50% - 37px);
+        }
+        .pitch-goal { position:absolute; top:28%; width:24px; height:44%; border:2px solid rgba(255,255,255,.85); z-index:1; }
+        .pitch-goal.left { left:-2px; border-left:0; border-radius:0 5px 5px 0; }
+        .pitch-goal.right { right:-2px; border-right:0; border-radius:5px 0 0 5px; }
+        .pitch-player, .pitch-ball { position:absolute; z-index:3; display:grid; place-items:center; }
+        .pitch-player {
+            width:22px; height:22px; border-radius:50%; background:#60a5fa; color:#0f172a;
+            border:2px solid white; font-size:9px; font-weight:800; box-shadow:0 3px 8px rgba(0,0,0,.28);
+        }
+        .pitch-player.a { left:16%; top:43%; }
+        .pitch-player.b { left:46%; top:22%; }
+        .pitch-player.c { right:18%; top:56%; }
+        .pitch-player.gk { right:3%; top:45%; background:#facc15; }
+        .pitch-ball { left:22%; top:47%; width:18px; height:18px; font-size:18px; filter:drop-shadow(0 3px 5px rgba(0,0,0,.35)); }
+        .pitch-hint {
+            position:absolute; left:50%; bottom:10px; transform:translateX(-50%); z-index:4;
+            padding:6px 10px; border-radius:999px; background:rgba(0,0,0,.55); color:white;
+            font-size:11px; white-space:nowrap; pointer-events:none;
+        }
+        .pitch-demo.playing .pitch-hint { display:none; }
+        .pitch-demo.playing .pitch-ball { animation:pitchBallMove 3.2s ease-in-out both; }
+        .pitch-demo.playing .pitch-player.a { animation:pitchPlayerA 3.2s ease-in-out both; }
+        .pitch-demo.playing .pitch-player.b { animation:pitchPlayerB 3.2s ease-in-out both; }
+        .pitch-demo.playing .pitch-player.c { animation:pitchPlayerC 3.2s ease-in-out both; }
+        .pitch-demo.playing .pitch-player.gk { animation:pitchKeeper 3.2s ease-in-out both; }
+        .pitch-demo.mode-shoot.playing .pitch-ball { animation-name:pitchShoot; }
+        .pitch-demo.mode-defense.playing .pitch-ball { animation-name:pitchDefense; }
+        .pitch-demo.mode-goalkeeper.playing .pitch-ball { animation-name:pitchKeeperBall; }
+        .pitch-demo.mode-fitness.playing .pitch-ball { animation-name:pitchFitness; }
+        .pitch-demo.mode-tactics.playing .pitch-ball { animation-name:pitchTactics; }
+        .pitch-demo.mode-defense.playing .pitch-player.c { animation-name:pitchDefender; }
+        .pitch-demo.mode-goalkeeper.playing .pitch-player.gk { animation-name:pitchKeeper; }
+        .demo-btn {
+            border:1px solid #166534; background:#14532d; color:white; border-radius:8px;
+            padding:8px 12px; cursor:pointer; font-weight:700; margin-top:8px;
+        }
+        .demo-btn:hover { background:#166534; }
+        @keyframes pitchBallMove {
+            0%{left:22%;top:47%;transform:scale(1)} 35%{left:46%;top:22%;transform:scale(1.05)}
+            65%{left:66%;top:56%;transform:scale(1)} 100%{left:78%;top:45%;transform:scale(.9)}
+        }
+        @keyframes pitchPlayerA {0%,100%{left:16%;top:43%} 40%{left:35%;top:36%} 70%{left:52%;top:31%}}
+        @keyframes pitchPlayerB {0%,100%{left:46%;top:22%} 40%{left:54%;top:35%} 70%{left:63%;top:48%}}
+        @keyframes pitchPlayerC {0%,100%{right:18%;top:56%} 40%{right:24%;top:50%} 70%{right:10%;top:44%}}
+        @keyframes pitchKeeper {0%,100%{right:3%;top:45%} 60%{right:5%;top:30%}}
+        @keyframes pitchShoot {0%{left:22%;top:47%;transform:scale(1)} 45%{left:55%;top:47%;transform:scale(1.1)} 100%{left:95%;top:34%;transform:scale(.75)}}
+        @keyframes pitchDefense {0%{left:75%;top:45%} 45%{left:54%;top:45%} 100%{left:30%;top:45%}}
+        @keyframes pitchKeeperBall {0%{left:72%;top:28%} 50%{left:90%;top:43%} 100%{left:72%;top:60%}}
+        @keyframes pitchFitness {0%{left:12%;top:20%} 25%{left:86%;top:20%} 50%{left:86%;top:72%} 75%{left:12%;top:72%} 100%{left:12%;top:20%}}
+        @keyframes pitchTactics {0%{left:22%;top:47%} 25%{left:45%;top:24%} 50%{left:68%;top:55%} 75%{left:48%;top:74%} 100%{left:22%;top:47%}}
+        @keyframes pitchDefender {0%,100%{right:18%;top:56%} 40%{right:35%;top:48%} 75%{right:46%;top:43%}}
+        @media (prefers-reduced-motion: reduce) {
+            .pitch-demo.playing .pitch-ball,.pitch-demo.playing .pitch-player { animation:none !important; }
+        }
         @media(max-width:800px){.dashboard,.planner-grid{grid-template-columns:repeat(2,1fr)}.week-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:520px){.dashboard,.planner-grid{grid-template-columns:1fr}.week-grid{grid-template-columns:1fr}.quick-row .ghost{margin-left:0}}
 
@@ -201,12 +279,7 @@ mark{background:#facc15;color:#111827;padding:0 2px;border-radius:2px}
 <section class="control-panel">
     <div class="section-title">⚡ BỘ CÔNG CỤ HUẤN LUYỆN</div>
     <div class="quick-row">
-        <button onclick="quickSearch('Dứt điểm')">🎯 Dứt điểm</button>
-        <button onclick="quickSearch('Chuyền')">🔄 Chuyền</button>
-        <button onclick="quickSearch('Pressing')">🔥 Pressing</button>
-        <button onclick="quickSearch('Thủ môn')">🧤 Thủ môn</button>
-        <button onclick="quickSearch('Rê bóng')">⚡ Rê bóng</button>
-        <button class="ghost" onclick="resetAll()">↺ Xóa bộ lọc</button>
+        <button type="button" class="saved-btn" onclick="showFavorites()">♥ Đã lưu (<span id="favoriteCount">0</span>)</button>
     </div>
 </section>
 
@@ -1401,10 +1474,28 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":
 const favoriteSet = new Set(JSON.parse(localStorage.getItem('footballFavorites') || '[]'));
 
 const badgeContainer=document.getElementById('type-badges');
+
+// Tạo nút danh mục bằng data-category để tránh lỗi click của inline onclick.
 footballData.system_info.supported_types.forEach(t=>{
-  badgeContainer.innerHTML += `<span class="badge" onclick="filterByCategory('${t}')">${t}</span>`;
+  const badge=document.createElement('button');
+  badge.type='button';
+  badge.className='badge';
+  badge.dataset.category=t;
+  badge.textContent=t;
+  badgeContainer.appendChild(badge);
 });
-badgeContainer.innerHTML += `<span class="badge" style="background:#16a34a" onclick="filterByCategory('all')">Hiển thị tất cả</span>`;
+
+const allBadge=document.createElement('button');
+allBadge.type='button';
+allBadge.className='badge';
+allBadge.dataset.category='all';
+allBadge.textContent='Hiển thị tất cả';
+allBadge.style.background='#16a34a';
+badgeContainer.appendChild(allBadge);
+
+badgeContainer.querySelectorAll('.badge').forEach(badge=>{
+  badge.addEventListener('click',()=>filterByCategory(badge.dataset.category));
+});
 
 function renderGrid(drills){
   const grid=document.getElementById('drills-grid');
@@ -1430,11 +1521,24 @@ function renderGrid(drills){
 }
 
 renderGrid(footballData.drills);
+updateFavoriteCount();
 
 function filterByCategory(category){
-  const filtered=category==='all'?footballData.drills:footballData.drills.filter(d=>d.category===category);
+  const normalizedCategory=String(category||'all');
+  const filtered=normalizedCategory==='all'
+    ? footballData.drills
+    : footballData.drills.filter(d=>d.category===normalizedCategory);
+
   renderGrid(filtered);
-  if(category!=='all') addMessage(`Đã lọc nhóm <b>${escapeHtml(category)}</b>: <b>${filtered.length}</b> bài tập.`,'bot');
+
+  if(normalizedCategory!=='all') {
+    addMessage(`Đã lọc nhóm <b>${escapeHtml(normalizedCategory)}</b>: <b>${filtered.length}</b> bài tập.`,'bot');
+  } else {
+    addMessage(`Đã hiển thị <b>${filtered.length}</b> bài tập thuộc tất cả danh mục.`,'bot');
+  }
+
+  const grid=document.getElementById('drills-grid');
+  if(grid) grid.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function toggleChat(){document.getElementById('chatBox').classList.toggle('active')}
 function handleKeyPress(e){if(e.key==='Enter')sendMessage()}
@@ -1514,29 +1618,90 @@ function addMessage(text,sender){
             document.getElementById('statTime').innerText = drills.reduce((s,d)=>s+d.duration_minutes,0);
         }
 
+        function updateFavoriteCount(){
+            const el=document.getElementById('favoriteCount');
+            if(el) el.textContent=favoriteSet.size;
+        }
+
+        function showFavorites(){
+            const savedDrills=footballData.drills.filter(d=>favoriteSet.has(d.id));
+            renderGrid(savedDrills);
+            const grid=document.getElementById('drills-grid');
+            if(grid) grid.scrollIntoView({behavior:'smooth',block:'start'});
+            if(!savedDrills.length){
+                addMessage('♥ Bạn chưa lưu bài tập nào. Hãy bấm <b>♡ Yêu thích</b> ở một bài tập để lưu lại.', 'bot');
+            }else{
+                addMessage(`♥ Đã hiển thị <b>${savedDrills.length}</b> bài tập bạn đã lưu.`, 'bot');
+            }
+        }
+
         function toggleFavorite(id){
             if(favoriteSet.has(id)) favoriteSet.delete(id); else favoriteSet.add(id);
             localStorage.setItem('footballFavorites', JSON.stringify([...favoriteSet]));
             const b=document.getElementById('fav-'+id);
             if(b){b.classList.toggle('active',favoriteSet.has(id));b.innerText=favoriteSet.has(id)?'♥ Đã lưu':'♡ Yêu thích';}
+            updateFavoriteCount();
+        }
+
+        function getPitchMode(category){
+            const c=norm(category);
+            if(c.includes('dut diem')) return 'mode-shoot';
+            if(c.includes('phong thu')) return 'mode-defense';
+            if(c.includes('thu mon')) return 'mode-goalkeeper';
+            if(c.includes('the luc')) return 'mode-fitness';
+            if(c.includes('chien thuat')) return 'mode-tactics';
+            return 'mode-pass';
         }
 
         function openDrill(id){
             const d=footballData.drills.find(x=>x.id===id); if(!d)return;
+            const safeId=escapeHtml(d.id);
+            const mode=getPitchMode(d.category);
+            const pitchTitle = mode==='mode-shoot' ? 'Mô phỏng: nhận bóng → dứt điểm' :
+                               mode==='mode-defense' ? 'Mô phỏng: di chuyển áp sát' :
+                               mode==='mode-goalkeeper' ? 'Mô phỏng: thủ môn xử lý bóng' :
+                               mode==='mode-fitness' ? 'Mô phỏng: di chuyển quanh khu vực' :
+                               mode==='mode-tactics' ? 'Mô phỏng: di chuyển chiến thuật' :
+                               'Mô phỏng: di chuyển và phối hợp';
+
             document.getElementById('modalContent').innerHTML=`
-              <span class="drill-id">${d.id} · ${d.category}</span>
-              <h2>${d.title}</h2>
-              <p><b>🎯 Mục tiêu:</b> ${d.objective}</p>
-              <p><b>📊 Cấp độ:</b> ${d.level} &nbsp; <b>🔥 Cường độ:</b> ${d.intensity}</p>
-              <p><b>👥 Số người:</b> ${d.players_required} &nbsp; <b>⏱️ Thời lượng:</b> ${d.duration_minutes} phút</p>
-              <div class="pitch"><div style="position:absolute;left:20%;top:45%;font-size:28px">⚽</div><div style="position:absolute;right:18%;top:38%;font-size:22px">●</div><div style="position:absolute;left:45%;top:20%;font-size:22px">●</div></div>
+              <span class="drill-id">${escapeHtml(d.id)} · ${escapeHtml(d.category)}</span>
+              <h2>${escapeHtml(d.title)}</h2>
+              <p><b>🎯 Mục tiêu:</b> ${escapeHtml(d.objective)}</p>
+              <p><b>📊 Cấp độ:</b> ${escapeHtml(d.level)} &nbsp; <b>🔥 Cường độ:</b> ${escapeHtml(d.intensity)}</p>
+              <p><b>👥 Số người:</b> ${escapeHtml(d.players_required)} &nbsp; <b>⏱️ Thời lượng:</b> ${escapeHtml(d.duration_minutes)} phút</p>
+              <div class="pitch-wrap">
+                <p class="pitch-label">⚽ Sơ đồ bài tập — ${pitchTitle}</p>
+                <div id="pitchDemo-${safeId}" class="pitch-demo ${mode}" role="button" tabindex="0" aria-label="Bấm để chạy mô phỏng sơ đồ" onclick="startPitchDemo('${safeId}')" onkeydown="if(event.key==='Enter'||event.key===' ')startPitchDemo('${safeId}')">
+                  <div class="pitch-goal left"></div><div class="pitch-goal right"></div>
+                  <div class="pitch-player a">A</div>
+                  <div class="pitch-player b">B</div>
+                  <div class="pitch-player c">C</div>
+                  <div class="pitch-player gk">GK</div>
+                  <div class="pitch-ball">⚽</div>
+                  <div class="pitch-hint">▶ Bấm vào sân để chạy mô phỏng</div>
+                </div>
+                <button class="demo-btn" type="button" onclick="startPitchDemo('${safeId}')">▶ Chạy mô phỏng</button>
+              </div>
+
               <h3>📋 Các bước thực hiện</h3>
               <ol>${d.steps.map(s=>`<li style="margin:8px 0">${escapeHtml(s)}</li>`).join('')}</ol>
               <div class="coaching-tip">💡 <b>Lưu ý HLV:</b> ${escapeHtml(d.coaching_points)}</div>
             `;
             document.getElementById('drillModal').classList.add('show');
         }
+
+        function startPitchDemo(id){
+            const pitch=document.getElementById('pitchDemo-'+id); if(!pitch)return;
+            pitch.classList.remove('playing');
+            void pitch.offsetWidth;
+            pitch.classList.add('playing');
+            clearTimeout(pitch._demoTimer);
+            pitch._demoTimer=setTimeout(()=>pitch.classList.remove('playing'),3400);
+        }
+
         function closeModal(e){ if(e.target.id==='drillModal') e.target.classList.remove('show'); }
+        document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('drillModal').classList.remove('show'); });
 
         function quickSearch(q){
             document.getElementById('userInput').value=q;
