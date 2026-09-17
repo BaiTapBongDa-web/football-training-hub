@@ -65,7 +65,7 @@ Phong cách:
 def home():
     return send_from_directory(
         os.path.dirname(os.path.abspath(__file__)),
-        ""index.html""
+        "index.html"
     )
 
 
