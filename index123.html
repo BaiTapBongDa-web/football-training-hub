@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football Training Hub — Giáo Trình & Trợ Lý AI</title>
+<style>
+:root{
+  --primary:#16a34a; --primary-dark:#14532d; --blue:#0f3d2e;
+  --bg:#07140f; --card:#10221a; --card2:#0c1b15; --text:#f8fafc;
+  --muted:#a7b8ae; --line:#234334; --accent:#facc15;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  margin:0; color:var(--text); min-height:100vh; padding:20px;
+  background:
+    radial-gradient(circle at 15% 15%,rgba(34,197,94,.18),transparent 28%),
+    radial-gradient(circle at 85% 80%,rgba(59,130,246,.12),transparent 30%),
+    linear-gradient(135deg,#06110c 0%,#0a1f15 48%,#07140f 100%);
+  position:relative; overflow-x:hidden;
+}
+body:before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.08;
+  background-image:
+    linear-gradient(30deg,#fff 12%,transparent 12.5%,transparent 87%,#fff 87.5%,#fff),
+    linear-gradient(150deg,#fff 12%,transparent 12.5%,transparent 87%,#fff 87.5%,#fff);
+  background-size:80px 140px; background-position:0 0,40px 70px;
+  z-index:-1;
+}
+body:after{
+  content:"⚽"; position:fixed; right:-35px; top:8%; font-size:230px;
+  opacity:.035; transform:rotate(-18deg); pointer-events:none; z-index:-1;
+}
+.container{max-width:1250px;margin:0 auto;padding-bottom:90px}
+header{
+  position:relative; overflow:hidden; color:white; padding:32px 25px;
+  border-radius:20px; text-align:center;
+  background:linear-gradient(135deg,#064e3b 0%,#15803d 48%,#0f766e 100%);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 15px 40px rgba(0,0,0,.3);
+}
+header:after{
+  content:""; position:absolute; width:300px;height:300px;border:2px solid rgba(255,255,255,.12);
+  border-radius:50%; right:-80px; top:-120px;
+}
+h1{margin:0 0 8px;font-size:clamp(25px,4vw,36px);letter-spacing:.5px}
+.subtitle{font-size:13px;color:#d1fae5;margin:0 0 14px}
+.badge-list{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.badge{
+  background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.18);
+  padding:7px 13px;border-radius:999px;font-size:13px;cursor:pointer;
+  transition:.2s;user-select:none
+}
+.badge:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.stat{padding:7px 12px;background:rgba(255,255,255,.1);border-radius:9px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:24px}
+.card{
+  background:linear-gradient(145deg,rgba(16,34,26,.98),rgba(9,25,18,.98));
+  border-radius:15px;padding:19px;border:1px solid var(--line);
+  box-shadow:0 7px 20px rgba(0,0,0,.22);display:flex;flex-direction:column;
+  justify-content:space-between;transition:.2s
+}
+.card:hover{transform:translateY(-4px);border-color:#36845b;box-shadow:0 12px 28px rgba(0,0,0,.3)}
+.card-header{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #1f3a2c;padding-bottom:10px;margin-bottom:12px}
+.drill-id{background:#173b2a;color:#86efac;font-weight:700;padding:4px 8px;border-radius:5px;font-size:11px}
+.drill-level{background:#3b3210;color:#fde68a;font-size:11px;padding:4px 8px;border-radius:5px;white-space:nowrap}
+.drill-title{font-size:18px;margin:0 0 8px;color:#f8fafc}
+.meta-info{font-size:12px;color:var(--muted);margin-bottom:11px}
+.objective{font-size:13px;color:#d6e3dc}
+.steps-list{padding-left:20px;font-size:13px;color:#d0ddd5}
+.steps-list li{margin-bottom:6px}
+.coaching-tip{background:#2a2410;border-left:4px solid var(--accent);padding:10px;font-size:12px;margin-top:12px;border-radius:0 6px 6px 0;color:#fef3c7}
+.empty{grid-column:1/-1;text-align:center;padding:45px;color:var(--muted);border:1px dashed #31533f;border-radius:14px}
+
+/* CHAT */
+.chat-toggle{
+  position:fixed;bottom:20px;right:20px;width:62px;height:62px;background:#16a34a;color:white;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;
+  cursor:pointer;box-shadow:0 8px 25px rgba(0,0,0,.4);z-index:1000;transition:.2s;border:2px solid #bbf7d0
+}
+.chat-toggle:hover{transform:scale(1.08)}
+.chat-box{
+  position:fixed;bottom:92px;right:20px;width:min(400px,calc(100vw - 30px));height:580px;
+  background:#0b1812;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.5);
+  display:none;flex-direction:column;z-index:1000;overflow:hidden;border:1px solid #31533f
+}
+.chat-box.active{display:flex}
+.chat-header{background:linear-gradient(135deg,#064e3b,#15803d);color:white;padding:13px 15px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.chat-close{cursor:pointer;font-size:18px}
+.chat-messages{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;font-size:13px;background:#08130e}
+.msg{padding:9px 12px;border-radius:9px;max-width:94%;line-height:1.45}
+.msg.bot{background:#16291f;color:#e5eee9;align-self:flex-start;border:1px solid #254333}
+.msg.user{background:#16a34a;color:white;align-self:flex-end}
+.filter-form{background:#0e2118;padding:10px;border-radius:9px;border:1px solid #2d4b3a;margin-top:8px;display:flex;flex-direction:column;gap:8px}
+.filter-form label{font-size:11px;font-weight:700;color:#cfe0d6}
+.filter-form select,.filter-form input{
+  padding:7px;font-size:12px;border-radius:5px;border:1px solid #3a5948;width:100%;
+  background:#09150f;color:#f8fafc;outline:none
+}
+.filter-btn{background:#16a34a;color:white;border:none;padding:8px;border-radius:5px;cursor:pointer;font-weight:700}
+.quick-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.quick-tags button{background:#173b2a;color:#bbf7d0;border:1px solid #315a43;border-radius:999px;padding:5px 8px;font-size:11px;cursor:pointer}
+.chat-input-area{display:flex;padding:10px;background:#0d1b14;border-top:1px solid #234334}
+.chat-input-area input{flex:1;border:1px solid #3a5948;background:#08130e;color:white;padding:9px 12px;border-radius:20px;outline:none;font-size:13px}
+.chat-input-area button{background:#16a34a;color:white;border:none;padding:8px 15px;margin-left:6px;border-radius:20px;cursor:pointer;font-weight:700}
+mark{background:#facc15;color:#111827;padding:0 2px;border-radius:2px}
+@media(max-width:600px){body{padding:10px}.grid{grid-template-columns:1fr}.chat-box{right:10px;bottom:82px}}
+
+        /* V2 FOOTBALL PERFORMANCE UI */
+        body {
+            background:
+              radial-gradient(circle at 15% 10%, rgba(34,197,94,.14), transparent 28%),
+              radial-gradient(circle at 85% 25%, rgba(59,130,246,.12), transparent 30%),
+              linear-gradient(135deg,#06130e,#0b1f16 45%,#07151d);
+            background-attachment: fixed;
+        }
+        body:before {
+            content:""; position:fixed; inset:0; pointer-events:none; opacity:.08;
+            background-image: linear-gradient(90deg,transparent 49.5%,#fff 50%,transparent 50.5%),
+                              linear-gradient(0deg,transparent 49.5%,#fff 50%,transparent 50.5%);
+            background-size:180px 180px;
+        }
+        header { position:relative; overflow:hidden; background:linear-gradient(135deg,#052e1b,#14532d 45%,#166534); border:1px solid rgba(255,255,255,.12); }
+        header:after { content:"⚽"; position:absolute; right:25px; bottom:-30px; font-size:150px; opacity:.08; transform:rotate(-18deg); }
+        .dashboard { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:20px; }
+        .stat { background:rgba(8,25,18,.88); border:1px solid rgba(74,222,128,.18); border-radius:12px; padding:16px; color:white; box-shadow:0 8px 25px rgba(0,0,0,.18); }
+        .stat b { display:block; font-size:26px; color:#4ade80; }
+        .stat span { font-size:12px; color:#cbd5e1; }
+        .control-panel,.planner,.week-plan { margin-top:18px; background:rgba(8,25,18,.88); border:1px solid rgba(74,222,128,.15); border-radius:12px; padding:18px; box-shadow:0 8px 25px rgba(0,0,0,.15); }
+        .section-title { color:#86efac; font-weight:800; letter-spacing:.7px; margin-bottom:12px; }
+        .quick-row { display:flex; flex-wrap:wrap; gap:8px; }
+        .quick-row button,.card-actions button { border:1px solid #334155; background:#10251b; color:#e2e8f0; padding:8px 12px; border-radius:7px; cursor:pointer; font-weight:700; }
+        .quick-row button:hover,.card-actions button:hover { border-color:#4ade80; transform:translateY(-1px); }
+        .quick-row .ghost { margin-left:auto; }
+        .planner-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+        .planner-grid label { color:#cbd5e1; font-size:12px; font-weight:700; }
+        .planner-grid input,.planner-grid select { width:100%; box-sizing:border-box; margin-top:5px; padding:9px; border-radius:7px; border:1px solid #334155; background:#0b1712; color:white; }
+        .generate-btn { margin-top:12px; width:100%; padding:11px; border:0; border-radius:8px; background:#16a34a; color:white; font-weight:900; cursor:pointer; }
+        .plan-result { margin-top:12px; color:#dbeafe; }
+        .plan-item { background:#0d2118; border-left:3px solid #22c55e; padding:10px; margin:7px 0; border-radius:5px; }
+        .week-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+        .day { min-height:80px; padding:10px; border-radius:8px; background:#0d2118; border:1px solid #1f3b2b; color:#cbd5e1; }
+        .day b { display:block; color:#86efac; margin-bottom:7px; }
+        .card {
+            background: linear-gradient(145deg, #10251b, #0b1b14) !important;
+            color: #e5f5eb;
+            border: 1px solid rgba(74,222,128,.20) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,.24);
+            transition: .2s;
+        }
+        .card .drill-title { color: #f0fdf4; }
+        .card .meta-info { color: #a7f3d0; }
+        .card p { color: #cbd5e1 !important; }
+        .card b { color: #e2e8f0; }
+        .card .steps-list { color: #cbd5e1; }
+        .card .card-header { border-bottom-color: rgba(148,163,184,.16); }
+        .card .coaching-tip {
+            background: rgba(120,53,15,.22);
+            color: #fde68a;
+            border-left-color: #f59e0b;
+        }
+        .card:hover { transform:translateY(-4px); box-shadow:0 14px 30px rgba(0,0,0,.18); }
+        .card-actions { display:flex; gap:8px; margin-top:12px; }
+        .card-actions button { flex:1; background:#0f3d2e; color:white; border-color:#14532d; }
+        .fav-btn.active { background:#b91c1c; }
+        .modal { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px; }
+        .modal.show { display:flex; }
+        .modal-card { position:relative; max-width:700px; width:100%; max-height:85vh; overflow:auto; background:#f8fafc; border-radius:14px; padding:24px; }
+        .modal-close { position:absolute; right:15px; top:12px; border:0; background:#fee2e2; color:#991b1b; border-radius:50%; width:32px; height:32px; cursor:pointer; }
+        .pitch { margin:16px 0; height:180px; border:2px solid #166534; border-radius:8px; position:relative; background:repeating-linear-gradient(90deg,#14532d 0 45px,#166534 45px 90px); }
+        .pitch:before { content:""; position:absolute; left:50%; top:0; bottom:0; border-left:2px solid rgba(255,255,255,.7); }
+        .pitch:after { content:""; position:absolute; width:65px; height:65px; border:2px solid rgba(255,255,255,.7); border-radius:50%; left:calc(50% - 34px); top:calc(50% - 34px); }
+        @media(max-width:800px){.dashboard,.planner-grid{grid-template-columns:repeat(2,1fr)}.week-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:520px){.dashboard,.planner-grid{grid-template-columns:1fr}.week-grid{grid-template-columns:1fr}.quick-row .ghost{margin-left:0}}
+
+
+        .drill-id { background:#172554; color:#bfdbfe; }
+        .drill-level { background:#14532d; color:#bbf7d0; }
+
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1 id="domain-title">⚽ HỆ THỐNG HUẤN LUYỆN BÓNG ĐÁ</h1>
+  <p class="subtitle">Giáo trình bài tập kỹ thuật • chiến thuật • thể lực • thủ môn — có trợ lý AI lọc bài tập</p>
+  <div class="badge-list" id="type-badges"></div>
+  <div class="stats"><span class="stat" id="countStat">50 bài tập</span><span class="stat">⚡ Lọc nhanh theo vị trí & trình độ</span><span class="stat">🤖 Tìm kiếm bằng từ khóa</span></div>
+</header>
+
+<div class="dashboard">
+    <div class="stat"><b id="statTotal">50</b><span>⚽ Tổng bài tập</span></div>
+    <div class="stat"><b id="statVisible">50</b><span>👀 Đang hiển thị</span></div>
+    <div class="stat"><b id="statAdvanced">0</b><span>🔥 Nâng cao</span></div>
+    <div class="stat"><b id="statTime">0</b><span>⏱ Tổng phút</span></div>
+</div>
+
+<section class="control-panel">
+    <div class="section-title">⚡ BỘ CÔNG CỤ HUẤN LUYỆN</div>
+    <div class="quick-row">
+        <button onclick="quickSearch('Dứt điểm')">🎯 Dứt điểm</button>
+        <button onclick="quickSearch('Chuyền')">🔄 Chuyền</button>
+        <button onclick="quickSearch('Pressing')">🔥 Pressing</button>
+        <button onclick="quickSearch('Thủ môn')">🧤 Thủ môn</button>
+        <button onclick="quickSearch('Rê bóng')">⚡ Rê bóng</button>
+        <button class="ghost" onclick="resetAll()">↺ Xóa bộ lọc</button>
+    </div>
+</section>
+
+<section class="planner">
+    <div class="section-title">📅 TẠO GIÁO ÁN NHANH</div>
+    <div class="planner-grid">
+        <label>Số cầu thủ<input id="planPlayers" type="number" min="1" value="12"></label>
+        <label>Thời lượng (phút)<select id="planDuration"><option>60</option><option selected>90</option><option>120</option></select></label>
+        <label>Mục tiêu<select id="planGoal"><option value="all">Cân bằng</option><option>Dứt điểm</option><option>Chuyền & Nhận</option><option>Phòng thủ</option><option>Chiến thuật</option><option>Thể lực</option><option>Kiểm soát bóng</option></select></label>
+        <label>Còn trước trận<select id="planDays"><option value="7">7+ ngày</option><option value="4">4–6 ngày</option><option value="2">2–3 ngày</option><option value="1">1 ngày</option></select></label>
+    </div>
+    <button class="generate-btn" onclick="generatePlan()">⚽ Tạo giáo án</button>
+    <div id="planResult" class="plan-result"></div>
+</section>
+
+<section class="week-plan">
+    <div class="section-title">🗓️ LỊCH TẬP TUẦN</div>
+    <div class="week-grid" id="weekGrid"></div>
+</section>
+
+<div class="grid" id="drills-grid"></div>
+
+<div class="modal" id="drillModal" onclick="closeModal(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="document.getElementById('drillModal').classList.remove('show')">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+</div>
+
+<div class="chat-toggle" onclick="toggleChat()" title="Mở trợ lý AI">⚽</div>
+<div class="chat-box" id="chatBox">
+  <div class="chat-header"><span>🤖 Trợ Lý AI — Bóng Đá</span><span class="chat-close" onclick="toggleChat()">✕</span></div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg bot">
+      Xin chào! Bạn có thể hỏi tự nhiên như <b>hello</b>, <b>hi</b>, <b>bạn làm được gì?</b> hoặc hỏi bất kỳ nội dung nào về huấn luyện bóng đá.
+      <div class="filter-form">
+        <div><label>🎯 Trình độ:</label><select id="levelSelect">
+          <option value="all">Tất cả mức độ</option><option value="Cơ bản">Cơ bản</option>
+          <option value="Trung bình">Trung bình</option><option value="Nâng cao">Nâng cao</option>
+          <option value="Mọi trình độ">Mọi trình độ</option>
+        </select></div>
+        <div><label>🩹 Vùng chấn thương cần tránh:</label><select id="injurySelect">
+          <option value="none">Không chấn thương</option><option value="co_chan">Cổ chân / Đầu gối / Chân</option>
+          <option value="lung_hong">Hông / Lưng / Đùi</option><option value="tay_vai">Tay / Vai / Ngực</option>
+        </select></div>
+        <div><label>📅 Còn bao nhiêu ngày nữa có trận?</label><input type="number" id="daysInput" placeholder="Ví dụ: 2 hoặc 8" min="0"></div>
+        <button class="filter-btn" onclick="applySmartFilter()">⚡ Lọc bài tập phù hợp</button>
+      </div>
+      <div class="quick-tags">
+        <button onclick="quickSearch('dứt điểm')">🥅 Dứt điểm</button>
+        <button onclick="quickSearch('chuyền')">🎯 Chuyền</button>
+        <button onclick="quickSearch('pressing')">🔥 Pressing</button>
+        <button onclick="quickSearch('thủ môn')">🧤 Thủ môn</button>
+        <button onclick="quickSearch('rê bóng')">🕺 Rê bóng</button>
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="userInput" placeholder="Hỏi bất cứ điều gì về bóng đá..." onkeypress="handleKeyPress(event)">
+    <button onclick="sendMessage()">Gửi</button>
+  </div>
+</div>
+
+<script>
+const footballData = {
+  system_info:{domain:"Huấn luyện bóng đá",supported_types:["Kiểm soát bóng","Chuyền & Nhận","Dứt điểm","Thủ môn","Phòng thủ","Thể lực","Chiến thuật"]},
+  drills:[
+  {
+    "id": "DRILL_001",
+    "category": "Kiểm soát bóng",
+    "title": "Tâng bóng đa điểm (Multitouch Juggling)",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tăng cảm giác bóng, linh hoạt cổ chân",
+    "steps": [
+      "Tâng bằng lòng bàn chân 10 lần.",
+      "Đổi sang tâng bằng mu bàn chân 10 lần.",
+      "Dùng đùi và ngực nhồi bóng xen kẽ."
+    ],
+    "coaching_points": "Khuỵu nhẹ chân trụ, chuyển trọng tâm mượt mà.",
+    "keywords": [
+      "Tâng bóng đa điểm (Multitouch Juggling)",
+      "Kiểm soát bóng"
+    ]
+  },
+  {
+    "id": "DRILL_002",
+    "category": "Thể lực",
+    "title": "Chạy thang dây + Bứt tốc ngắn",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [
+      "co_chan",
+      "lung_hong"
+    ],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Tăng độ nhanh nhẹn đôi chân & bứt tốc",
+    "steps": [
+      "Bước nhỏ dọc thang dây.",
+      "Thoát khỏi thang dây, bứt tốc 10m.",
+      "Chạy chậm thả lỏng về vạch xuất phát."
+    ],
+    "coaching_points": "Nhón gót chân, đánh tay nhịp nhàng.",
+    "keywords": [
+      "Chạy thang dây + Bứt tốc ngắn",
+      "Thể lực"
+    ]
+  },
+  {
+    "id": "DRILL_003",
+    "category": "Chuyền & Nhận",
+    "title": "Chuyền tường 1-2 & Nhận bóng quay người",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Cải thiện nhịp nhận bóng & mở tư thế",
+    "steps": [
+      "Đứng cách tường 3-5m chuyền mạnh.",
+      "Đỡ bóng mở sang hướng khác.",
+      "Xoay người 180 độ rê bóng ngắn."
+    ],
+    "coaching_points": "Góc nhận bóng phải mở rộng quan sát.",
+    "keywords": [
+      "Chuyền tường 1-2 & Nhận bóng quay người",
+      "Chuyền & Nhận"
+    ]
+  },
+  {
+    "id": "DRILL_004",
+    "category": "Chuyền & Nhận",
+    "title": "Bóng ma Rondo 4v2",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 6,
+    "duration_minutes": 20,
+    "objective": "Chuyền bóng nhanh hẹp, quan sát không gian",
+    "steps": [
+      "4 người đứng ngoài biên kiểm soát bóng.",
+      "2 người vào giữa làm ma tranh bóng.",
+      "Giới hạn 1-2 chạm."
+    ],
+    "coaching_points": "Luôn quan sát trước khi nhận bóng (scanning).",
+    "keywords": [
+      "Bóng ma Rondo 4v2",
+      "Chuyền & Nhận"
+    ]
+  },
+  {
+    "id": "DRILL_005",
+    "category": "Dứt điểm",
+    "title": "Dứt điểm xoay người 1v1 trong vòng cấm",
+    "level": "Nâng cao",
+    "intensity": "khó",
+    "avoid_injuries": [
+      "lung_hong",
+      "tay_vai"
+    ],
+    "players_required": 2,
+    "duration_minutes": 25,
+    "objective": "Tăng khả năng đè người & dứt điểm nhanh",
+    "steps": [
+      "Tiền đạo quay lưng khung thành bị đè.",
+      "Đồng đội chuyền bóng vào chân.",
+      "Tì đè xoay người dứt điểm."
+    ],
+    "coaching_points": "Dùng hông vai trụ chắc, dứt điểm ngay.",
+    "keywords": [
+      "Dứt điểm xoay người 1v1 trong vòng cấm",
+      "Dứt điểm"
+    ]
+  },
+  {
+    "id": "DRILL_006",
+    "category": "Kiểm soát bóng",
+    "title": "Rê bóng Zigzag qua nón (Zigzag Cone Dribble)",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Cải thiện khả năng điều khiển bóng bằng nhiều bề mặt chân trong phạm vi hẹp.",
+    "steps": [
+      "Dẫn bóng luồn lách qua các nón chóp.",
+      "Hiệp 1: Chỉ dùng lòng trong chân thuận.",
+      "Hiệp 2: Chỉ dùng má ngoài chân thuận.",
+      "Hiệp 3: Phối hợp lòng trong và má ngoài cả hai chân."
+    ],
+    "coaching_points": "Bước chân ngắn, giữ bóng cách chân không quá 50cm.",
+    "keywords": [
+      "Rê bóng Zigzag qua nón (Zigzag Cone Dribble)",
+      "Kiểm soát bóng"
+    ]
+  },
+  {
+    "id": "DRILL_007",
+    "category": "Chuyền & Nhận",
+    "title": "Chuyền bóng hình tam giác (Triangle Passing)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 3,
+    "duration_minutes": 20,
+    "objective": "Tăng phản xạ chuyền - di chuyển (Pass & Move) và nhịp nhận bóng.",
+    "steps": [
+      "Ba người đứng tại 3 đỉnh tam giác.",
+      "Người A chuyền sệt cho người B, sau đó di chuyển áp sát nhẹ.",
+      "Người B đỡ bóng mở góc rồi chuyền cho C."
+    ],
+    "coaching_points": "Chuyền vào chân thuận của đồng đội, mở hông trước khi nhận bóng.",
+    "keywords": [
+      "Chuyền bóng hình tam giác (Triangle Passing)",
+      "Chuyền & Nhận"
+    ]
+  },
+  {
+    "id": "DRILL_008",
+    "category": "Dứt điểm",
+    "title": "Sút bóng xoáy cứa lòng (Finesse / Curled Shot)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [
+      "co_chan"
+    ],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Cải thiện kỹ thuật cứa lòng vào góc xa khung thành.",
+    "steps": [
+      "Rê bóng từ góc cánh vào trung lộ.",
+      "Đặt chân trụ bên cạnh bóng, hướng về góc xa.",
+      "Dùng lòng trong miết vào hông dưới bóng."
+    ],
+    "coaching_points": "Thân người hơi ngả về sau và nghiêng theo hướng vung chân.",
+    "keywords": [
+      "Sút bóng xoáy cứa lòng (Finesse / Curled Shot)",
+      "Dứt điểm"
+    ]
+  },
+  {
+    "id": "DRILL_009",
+    "category": "Thủ môn",
+    "title": "Phản xạ thủ môn với bóng bật tường",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tăng tốc độ phản xạ và kỹ thuật bắt bóng sệt/tầm trung.",
+    "steps": [
+      "Đứng đối diện tường cách 2-3m.",
+      "Ném hoặc sút bóng mạnh vào tường để bóng bật ra ngẫu nhiên.",
+      "Đổ người hoặc di chuyển bắt dính bóng."
+    ],
+    "coaching_points": "Tạo hình bàn tay chữ W khi bắt bóng tầm ngực.",
+    "keywords": [
+      "Phản xạ thủ môn với bóng bật tường",
+      "Thủ môn"
+    ]
+  },
+  {
+    "id": "DRILL_010",
+    "category": "Phòng thủ",
+    "title": "Phòng thủ 1v1 lùi bắt bóng (1v1 Defensive Jockeying)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 2,
+    "duration_minutes": 20,
+    "objective": "Rèn luyện tư thế phòng thủ, ép đối phương ra biên.",
+    "steps": [
+      "Tiền đạo dẫn bóng tấn công.",
+      "Hậu vệ đứng nghiêng người, lùi giữ khoảng cách 1-1.5m.",
+      "Chờ cơ hội thò chân cắt bóng."
+    ],
+    "coaching_points": "Nhón gót lùi linh hoạt, nhìn vào bóng chứ không nhìn chân đối phương.",
+    "keywords": [
+      "Phòng thủ 1v1 lùi bắt bóng (1v1 Defensive Jockeying)",
+      "Phòng thủ"
+    ]
+  },
+  {
+    "id": "DRILL_011",
+    "category": "Thể lực",
+    "title": "Bứt tốc thiết lập lại vị trí (Shuttle Run)",
+    "level": "Nâng cao",
+    "intensity": "khó",
+    "avoid_injuries": [
+      "co_chan",
+      "lung_hong"
+    ],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Cải thiện sức bền tốc độ và đổi hướng liên tục.",
+    "steps": [
+      "Bứt tốc từ vạch 0m lên 5m, 10m, 15m, 20m rồi quay về."
+    ],
+    "coaching_points": "Hạ thấp trọng tâm sâu khi quay đầu để tránh chấn thương.",
+    "keywords": [
+      "Bứt tốc thiết lập lại vị trí (Shuttle Run)",
+      "Thể lực"
+    ]
+  },
+  {
+    "id": "DRILL_012",
+    "category": "Chuyền & Nhận",
+    "title": "Chuyền bóng dài đổi cánh (Long Diagonal Pass)",
+    "level": "Nâng cao",
+    "intensity": "khó",
+    "avoid_injuries": [
+      "co_chan"
+    ],
+    "players_required": 2,
+    "duration_minutes": 20,
+    "objective": "Nâng cao độ chính xác đường chuyền dài bổng.",
+    "steps": [
+      "Đứng cách nhau 25-35m.",
+      "Chuyền bổng rót bóng vào ngực/chân đồng đội.",
+      "Người nhận khống chế bóng chết tại chỗ."
+    ],
+    "coaching_points": "Khóa cổ chân, miết mu bàn chân vào dưới tâm bóng.",
+    "keywords": [
+      "Chuyền bóng dài đổi cánh (Long Diagonal Pass)",
+      "Chuyền & Nhận"
+    ]
+  },
+  {
+    "id": "DRILL_013",
+    "category": "Kiểm soát bóng",
+    "title": "Đỡ bóng bổng bằng ngực và đùi (Aerial Control)",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [
+      "tay_vai"
+    ],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Làm chủ các đường bóng bổng, giảm lực nảy.",
+    "steps": [
+      "Tự tung bóng lên cao 4-5m.",
+      "Dùng ngực/đùi ngả nhẹ về sau theo nhịp bóng chạm."
+    ],
+    "coaching_points": "Thả lỏng cơ ngực/đùi ngay thời điểm tiếp xúc.",
+    "keywords": [
+      "Đỡ bóng bổng bằng ngực và đùi (Aerial Control)",
+      "Kiểm soát bóng"
+    ]
+  },
+  {
+    "id": "DRILL_014",
+    "category": "Dứt điểm",
+    "title": "Dứt điểm sút bóng sống (Volley Shot)",
+    "level": "Nâng cao",
+    "intensity": "khó",
+    "avoid_injuries": [
+      "co_chan"
+    ],
+    "players_required": 2,
+    "duration_minutes": 20,
+    "objective": "Ra chân dứt điểm khi bóng di chuyển trên không.",
+    "steps": [
+      "Đồng đội tạt bóng bổng vào vòng cấm.",
+      "Tiền đạo di chuyển cắt mặt, bắt volley bằng mu bàn chân."
+    ],
+    "coaching_points": "Đầu gối chân sút đè lên trên bóng để tránh vọt xà.",
+    "keywords": [
+      "Dứt điểm sút bóng sống (Volley Shot)",
+      "Dứt điểm"
+    ]
+  },
+  {
+    "id": "DRILL_015",
+    "category": "Chiến thuật",
+    "title": "Chạy chỗ phá bẫy việt vị (Offside Trap Breaking)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 3,
+    "duration_minutes": 20,
+    "objective": "Di chuyển thông minh đúng thời điểm đón đường chuyền khe.",
+    "steps": [
+      "Tiền đạo di chuyển ngang vạch phòng thủ.",
+      "Bứt tốc vòng qua lưng hậu vệ thoát xuống nhận bóng."
+    ],
+    "coaching_points": "Nhịp di chuyển phải trùng khớp với nhịp chạm bóng chuyền.",
+    "keywords": [
+      "Chạy chỗ phá bẫy việt vị (Offside Trap Breaking)",
+      "Chiến thuật"
+    ]
+  },
+  {
+    "id": "DRILL_016",
+    "category": "Kiểm soát bóng",
+    "title": "Kéo bóng bằng gầm giày (Sole Roll & Cut)",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tăng sự linh hoạt khi thao tác bóng bằng gầm giày.",
+    "steps": [
+      "Kéo bóng bằng gầm giày sang ngang.",
+      "Đẩy bóng đi thẳng bằng má trong/ngoài chân kia."
+    ],
+    "coaching_points": "Nhún chân trụ linh hoạt, miết lực vừa phải.",
+    "keywords": [
+      "Kéo bóng bằng gầm giày (Sole Roll & Cut)",
+      "Kiểm soát bóng"
+    ]
+  },
+  {
+    "id": "DRILL_017",
+    "category": "Chiến thuật",
+    "title": "Phản công nhanh 2v1 (2v1 Fast Break)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 3,
+    "duration_minutes": 25,
+    "objective": "Rèn luyện tư duy đưa ra quyết định trong thế hơn người.",
+    "steps": [
+      "2 tiền đạo phối hợp kéo giãn 1 hậu vệ.",
+      "Chuyền bóng hoặc dứt điểm tùy phản ứng hậu vệ."
+    ],
+    "coaching_points": "Tốc độ tấn công nhanh, tối đa 3-4 đường chuyền.",
+    "keywords": [
+      "Phản công nhanh 2v1 (2v1 Fast Break)",
+      "Chiến thuật"
+    ]
+  },
+  {
+    "id": "DRILL_018",
+    "category": "Chiến thuật",
+    "title": "Đánh đầu tấn công và giải nguy (Heading Drill)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [
+      "tay_vai"
+    ],
+    "players_required": 2,
+    "duration_minutes": 15,
+    "objective": "Cải thiện điểm bật nhảy và điểm tiếp xúc đầu.",
+    "steps": [
+      "Đánh đầu cắm bóng xuống đất (Tấn công).",
+      "Đánh đầu phá bóng lên cao xa (Phòng thủ)."
+    ],
+    "coaching_points": "Dùng trán tiếp xúc bóng, gập cơ bụng tạo lực.",
+    "keywords": [
+      "Đánh đầu tấn công và giải nguy (Heading Drill)",
+      "Chiến thuật"
+    ]
+  },
+  {
+    "id": "DRILL_019",
+    "category": "Phòng thủ",
+    "title": "Xoạc bóng cắt bóng chuẩn xác (Sliding Tackle)",
+    "level": "Nâng cao",
+    "intensity": "khó",
+    "avoid_injuries": [
+      "co_chan",
+      "lung_hong"
+    ],
+    "players_required": 2,
+    "duration_minutes": 15,
+    "objective": "Xoạc cắt bóng chính xác, hạn chế phạm lỗi.",
+    "steps": [
+      "Chạy song song tăng tốc với tiền đạo.",
+      "Duỗi chân xa bóng lướt cỏ gạt trúng bóng."
+    ],
+    "coaching_points": "Chân trụ gập lại lướt trên mặt cỏ để tiếp đất an toàn.",
+    "keywords": [
+      "Xoạc bóng cắt bóng chuẩn xác (Sliding Tackle)",
+      "Phòng thủ"
+    ]
+  },
+  {
+    "id": "DRILL_020",
+    "category": "Chiến thuật",
+    "title": "Tập quan sát không gian (Scanning Drill)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 2,
+    "duration_minutes": 15,
+    "objective": "Tạo thói quen ngoái đầu quan sát trước khi nhận bóng.",
+    "steps": [
+      "Cầu thủ đứng quay lưng, ngoái đầu đọc màu nón chóp.",
+      "Nhận bóng 1 chạm và xoay người di chuyển."
+    ],
+    "coaching_points": "Ngoái đầu (scanning) ít nhất 1-2 lần trước khi nhận bóng.",
+    "keywords": [
+      "Tập quan sát không gian (Scanning Drill)",
+      "Chiến thuật"
+    ]
+  },
+  {
+    "id": "DRILL_021",
+    "category": "Kiểm soát bóng",
+    "title": "Đè người giữ bóng bằng lưng (Hold-Up Play)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [
+      "lung_hong",
+      "tay_vai"
+    ],
+    "players_required": 2,
+    "duration_minutes": 15,
+    "objective": "Bảo vệ bóng trước sức áp sát từ phía sau.",
+    "steps": [
+      "Giang rộng hai tay tạo khoảng cách với hậu vệ.",
+      "Dùng hông đùi làm trọng tâm trụ vững khống chế bóng."
+    ],
+    "coaching_points": "Mở rộng cơ thể, hạ trọng tâm người xuống thấp.",
+    "keywords": [
+      "Đè người giữ bóng bằng lưng (Hold-Up Play)",
+      "Kiểm soát bóng"
+    ]
+  },
+  {
+    "id": "DRILL_022",
+    "category": "Thể lực",
+    "title": "Thể lực chuyên sâu Tabata nóng (HIIT)",
+    "level": "Nâng cao",
+    "intensity": "khó",
+    "avoid_injuries": [
+      "co_chan",
+      "lung_hong"
+    ],
+    "players_required": 1,
+    "duration_minutes": 16,
+    "objective": "Tăng sức bền tim mạch và khả năng hồi phục.",
+    "steps": [
+      "20s nâng cao đùi -> 10s nghỉ.",
+      "20s bứt tốc -> 10s nghỉ.",
+      "20s Burpees -> 10s nghỉ."
+    ],
+    "coaching_points": "Duy trì cường độ cao nhất trong 20 giây tập.",
+    "keywords": [
+      "Thể lực chuyên sâu Tabata nóng (HIIT)",
+      "Thể lực"
+    ]
+  },
+  {
+    "id": "DRILL_023",
+    "category": "Dứt điểm",
+    "title": "Sút Penalty và đối mặt 1v1",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 2,
+    "duration_minutes": 15,
+    "objective": "Rèn sự bình tĩnh và dứt điểm kết liễu trận đấu.",
+    "steps": [
+      "Sút 5 cú phạt đền góc cố định.",
+      "Rê bóng đối mặt 1v1 với thủ môn."
+    ],
+    "coaching_points": "Quyết định góc sút trước khi chạy đà.",
+    "keywords": [
+      "Sút Penalty và đối mặt 1v1",
+      "Dứt điểm"
+    ]
+  },
+  {
+    "id": "DRILL_024",
+    "category": "Chuyền & Nhận",
+    "title": "Chuyền bóng bật nhanh 1-2 (One-Two Passing)",
+    "level": "Cơ bản",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 2,
+    "duration_minutes": 15,
+    "objective": "Phối hợp đập nhả nhanh loại bỏ hậu vệ.",
+    "steps": [
+      "Chuyền sệt cho đồng đội rồi bứt tốc vượt qua nón.",
+      "Đồng đội chuyền 1 chạm vừa tầm chạy."
+    ],
+    "coaching_points": "Đường chuyền phải đúng tầm chân chạy của đồng đội.",
+    "keywords": [
+      "Chuyền bóng bật nhanh 1-2 (One-Two Passing)",
+      "Chuyền & Nhận"
+    ]
+  },
+  {
+    "id": "DRILL_025",
+    "category": "Thủ môn",
+    "title": "Bắt bóng bổng & Phát bóng nhanh (GK Distribution)",
+    "level": "Trung bình",
+    "intensity": "trung bình",
+    "avoid_injuries": [
+      "co_chan"
+    ],
+    "players_required": 2,
+    "duration_minutes": 20,
+    "objective": "Làm chủ vùng cấm và phát động phản công nhanh.",
+    "steps": [
+      "Đón tạt bóng bổng, hô 'BÓNG CỦA TÔI'.",
+      "Bật nhảy 1 chân thu bóng ở điểm cao nhất.",
+      "Ném bóng tên lửa hoặc ném sệt phản công."
+    ],
+    "coaching_points": "Bật nhảy đưa gối chân còn lại lên cao bảo vệ bản thân.",
+    "keywords": [
+      "Bắt bóng bổng & Phát bóng nhanh (GK Distribution)",
+      "Thủ môn"
+    ]
+  },
+  {
+    "id": "DRILL_026",
+    "category": "Kiểm soát bóng",
+    "title": "RÊ BÓNG BIẾN TỐC & CHUYỂN HƯỚNG (STOP AND GO DRIBBLE)",
+    "level": "Cơ bản - Trung bình | **Số người:** 1 người",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Cải thiện khả năng thay đổi tốc độ đột ngột để loại bỏ sự bám đuổi của đối phương.",
+    "steps": [
+      "Ngừng bóng đột ngột bằng gầm giày hoặc lòng bàn chân tại nón thứ nhất.",
+      "Bứt tốc tối đa dẫn bóng sang nón thứ hai.",
+      "Lặp lại nhịp \"giảm tốc - tăng tốc\" cho đến hết chuỗi nón. Thực hiện 8-10 lượt."
+    ],
+    "coaching_points": "Hạ thấp trọng tâm sâu khi dừng bóng, dùng đẩy bóng dài vừa đủ ở nhịp bứt tốc tiếp theo.",
+    "keywords": [
+      "`Re bong bien toc`",
+      "`Stop and go drill`",
+      "`Doi toc do re bong`",
+      "`Qua nguoi bang toc do`"
+    ]
+  },
+  {
+    "id": "DRILL_027",
+    "category": "Kiểm soát bóng",
+    "title": "XOAY NGƯỜI ROULETTE / MARADONA TURN",
+    "level": "Nâng cao | **Số người:** 1 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Thoát gọng kìm hoặc qua người trong phạm vi hẹp khi bị áp sát từ phía trước.",
+    "steps": [
+      "Đặt gầm giày chân thuận lên đỉnh bóng, kéo nhẹ bóng về sau đồng thời xoay lưng lại với đối thủ.",
+      "Đặt tiếp gầm giày chân không thuận lên bóng, giật bóng tiếp theo hướng di chuyển và quay người 360 độ thoát đi.",
+      "Thực hiện 20 lần mỗi chân."
+    ],
+    "coaching_points": "Động tác kéo bóng phải liên tục, dùng lưng che chắn hướng di chuyển của hậu vệ.",
+    "keywords": [
+      "`Xoay nguoi Roulette`",
+      "`Maradona turn`",
+      "`Ky thuat xoay xo`",
+      "`Qua nguoi ky thuat`"
+    ]
+  },
+  {
+    "id": "DRILL_028",
+    "category": "Chuyền & Nhận",
+    "title": "CHUYỀN BÓNG 1 CHẠM TRONG Ô VUÔNG (ONE-TOUCH PASSING SQUARE)",
+    "level": "Trung bình | **Số người:** 4 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Tăng tốc độ tư duy chuyền bóng và phản xạ nhả bóng 1 chạm.",
+    "steps": [
+      "Chuyền bóng liên tục theo chiều kim đồng hồ bằng 1 chạm duy nhất.",
+      "Sau 5 phút, đảo ngược chiều chuyền bóng.",
+      "Nâng cao: Đổi sang chuyền chéo góc hoặc chuyền theo hiệu lệnh gọi tên."
+    ],
+    "coaching_points": "Khóa cổ chân chắc chắn, dùng lòng trong để điều hướng đường chuyên chuẩn xác.",
+    "keywords": [
+      "`Chuyen 1 cham`",
+      "`One touch passing`",
+      "`Chuyen bong nhanh`",
+      "`Tuduy 1 cham`"
+    ]
+  },
+  {
+    "id": "DRILL_029",
+    "category": "Chiến thuật",
+    "title": "TẠT BÓNG TỪ BIÊN VÀO VÒNG CẤM (CROSSING DRILL)",
+    "level": "Trung bình - Nâng cao | **Số người:** 2 - 3 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Rèn luyện kỹ năng tạt bóng bổng/sệt từ dọc biên vào vùng nguy hiểm.",
+    "steps": [
+      "Quan sát nhanh vòng cấm và vung chân tạt bóng (bổng rót vào cột xa hoặc sệt căng vào cột gần).",
+      "Tiền đạo bên trong di chuyển đón bóng dứt điểm.",
+      "Đổi bên cánh sau 10 lần tạt."
+    ],
+    "coaching_points": "Thắt chặt cổ chân, dùng má trong hoặc mu bàn chân miết bên dưới bóng để bóng cuộn vào trong.",
+    "keywords": [
+      "`Tat bong tu bien`",
+      "`Crossing drill`",
+      "`Tat bong san 7`",
+      "`Giao bong tu bien`"
+    ]
+  },
+  {
+    "id": "DRILL_030",
+    "category": "Dứt điểm",
+    "title": "ĐÂM CẮT MẶT DỨT ĐIỂM (NEAR POST RUN FINISHING)",
+    "level": "Trung bình - Nâng cao | **Số người:** 2 - 3 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Đón đường tạt từ biên, di chuyển cắt mặt hậu vệ để dứt điểm nhanh.",
+    "steps": [
+      "Bất ngờ bứt tốc đâm thẳng vào khoảng trống cột gần (Near post) ngay khi bóng được tạt ra từ biên.",
+      "Chạm bóng dứt điểm 1 chạm bằng lòng chân hoặc đầu.",
+      "Lặp lại 12 lần."
+    ],
+    "coaching_points": "Phải di chuyển trước hậu vệ 1 nhịp, ưu tiên dứt điểm vào góc gần hoặc đổi hướng bóng.",
+    "keywords": [
+      "`Cat mat dut diem`",
+      "`Near post run`",
+      "`Chay cho tienda`",
+      "`Tiendao cat mat`"
+    ]
+  },
+  {
+    "id": "DRILL_031",
+    "category": "Kiểm soát bóng",
+    "title": "DI CHUYỂN BÓNG BẰNG MÁ NGOÀI (OUTSIDE FOOT DRIBBLE)",
+    "level": "Cơ bản | **Số người:** 1 người",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tăng sự linh hoạt khi đẩy bóng và đổi hướng bằng má ngoài bàn chân.",
+    "steps": [
+      "Chỉ sử dụng má ngoài của chân thuận để đẩy bóng từng bước một.",
+      "Đổi sang dùng má ngoài của chân không thuận.",
+      "Thực hiện trong 10-15 phút."
+    ],
+    "coaching_points": "Nhón gót chân trụ, cổ chân chạm bóng gập nhẹ vào trong để miết má ngoài chuẩn xác.",
+    "keywords": [
+      "`Re bong ma ngoai`",
+      "`Outside foot touch`",
+      "`Cam giac ma ngoai`",
+      "`Dieu khien bong`"
+    ]
+  },
+  {
+    "id": "DRILL_032",
+    "category": "Kiểm soát bóng",
+    "title": "BẮT VÒNG BÓNG QUA ĐẦU (SOMBRERO FLICK)",
+    "level": "Nâng cao | **Số người:** 1 - 2 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Khống chế bóng nảy và tâng bóng qua đầu đối thủ trong không gian hẹp.",
+    "steps": [
+      "Dùng mũi giày móc nhẹ dưới đáy bóng để hất bóng bổng qua đầu đối phương đang lao tới.",
+      "Di chuyển vòng qua người đối phương để đón bóng rơi phía sau.",
+      "Thực hiện 15-20 lần."
+    ],
+    "coaching_points": "Lực hất bóng phải vừa đủ cao qua tầm tay/đầu đối thủ nhưng không quá xa để kịp bứt tốc theo.",
+    "keywords": [
+      "`Giat bong qua dau`",
+      "`Sombrero flick`",
+      "`Ky thuat ngau hung`",
+      "`Qua nguoi ngau hung`"
+    ]
+  },
+  {
+    "id": "DRILL_033",
+    "category": "Chiến thuật",
+    "title": "TẬP CHẠY ÉP SÂN (HIGH PRESSING DRILL)",
+    "level": "Trung bình - Nâng cao | **Số người:** 4 - 6 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 25,
+    "objective": "Rèn luyện khả năng di chuyển đồng bộ để bóp nghẹt không gian chơi bóng của đối phương.",
+    "steps": [
+      "Khi bóng chuyền ra biên, người gần nhất lập tức lao vào áp sát góc chuyền, các người còn lại dâng cao bịt đường chuyền về trung lộ.",
+      "Cướp được bóng trong vòng 5 giây thì thực hiện dứt điểm ngay."
+    ],
+    "coaching_points": "Pressing không chỉ là chạy hùng hục mà phải vừa chạy vừa dùng thân người che góc chuyền (Cover shadow).",
+    "keywords": [
+      "`Ap sat high pressing`",
+      "`Pressing nhom`",
+      "`Bay ap sat`",
+      "`Chien thuat pressing`"
+    ]
+  },
+  {
+    "id": "DRILL_034",
+    "category": "Thủ môn",
+    "title": "ĐỔ NGƯỜI BẮT BÓNG CHÂN HẬU VỆ (GOALKEEPING LOW DIVE)",
+    "level": "Trung bình | **Số người:** 2 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Rèn luyện kỹ thuật đổ người nhanh bắt bóng sệt sát góc khung thành.",
+    "steps": [
+      "HLV/Đồng đội sút hoặc sút nhẹ bóng sệt về hai góc hiểm.",
+      "Thủ môn nhún chân trụ, đạp mạnh sang bên và đổ sát người xuống mặt cỏ cản bóng.",
+      "Thực hiện 8-10 lần mỗi bên."
+    ],
+    "coaching_points": "Tiếp đất bằng hông và mạn sườn, tránh dùng cùi trỏ hoặc đầu gối cắm trực tiếp xuống đất.",
+    "keywords": [
+      "`Thu mon do nguoi`",
+      "`Low dive goalkeeper`",
+      "`Bat bong set`",
+      "`Kynang thu mon`"
+    ]
+  },
+  {
+    "id": "DRILL_035",
+    "category": "Dứt điểm",
+    "title": "SÚT BÓNG ĐẠI BÁC / BÓNG ĐI THẲNG (POWER SHOT / KNUCKLEBALL)",
+    "level": "Nâng cao | **Số người:** 1 - 2 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Tối ưu hóa lực sút bóng căng, đi thẳng hoặc liệng dành cho các cú sút xa.",
+    "steps": [
+      "Chạy đà thẳng 3-4 bước. Chân trụ đặt ngang và cách bóng khoảng 15-20cm.",
+      "Dùng phần mu trong bàn chân (xương ngón chân cái) đập mạnh vào tâm quả bóng.",
+      "Khóa cứng cổ chân cho đến khi kết thúc đà vung."
+    ],
+    "coaching_points": "Không miết lòng hay xoáy bóng, ngực đè lên bóng tại thời điểm va chạm để bóng không vọt xà.",
+    "keywords": [
+      "`Sut bong manh`",
+      "`Power shot drill`",
+      "`Sut knuckball`",
+      "`Sut mu ban chan`"
+    ]
+  },
+  {
+    "id": "DRILL_036",
+    "category": "Kiểm soát bóng",
+    "title": "NHẬN BÓNG QUAY NGƯỜI 180 ĐỘ (TURNING WITH BALL)",
+    "level": "Cơ bản - Trung bình | **Số người:** 2 người",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tiếp nhận đường chuyền từ tuyến dưới và xoay người nhanh về hướng tấn công.",
+    "steps": [
+      "Người B di chuyển đón bóng, dùng má trong hoặc má ngoài khống chế bóng nhịp 1 vòng qua chân trụ xoay người 180 độ.",
+      "Rê bóng bứt tốc 3m rồi chuyền trả lại cho A.",
+      "Thực hiện 15-20 lần."
+    ],
+    "coaching_points": "Xoay hông nhanh ngay trong nhịp chạm bóng đầu tiên, quan sát phía sau trước khi nhận bóng.",
+    "keywords": [
+      "`Nhan bong xoay nguoi`",
+      "`Turn 180 degree`",
+      "`Thoat quay nguoi`",
+      "`Nhan bong quay lung`"
+    ]
+  },
+  {
+    "id": "DRILL_037",
+    "category": "Kiểm soát bóng",
+    "title": "CHÁO CHÂN QUA NGƯỜI (STEP OVER / CRUYFF TURN)",
+    "level": "Trung bình | **Số người:** 1 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Đánh lừa hướng di chuyển của đối phương bằng động tác giả đảo chân qua bóng.",
+    "steps": [
+      "Vung chân vòng từ trong ra ngoài qua đầu quả bóng nhưng không chạm bóng.",
+      "Dùng chân còn lại nhấn mạnh má ngoài đẩy bóng sang hướng ngược lại và bứt tốc.",
+      "Lặp lại 20 lần mỗi bên."
+    ],
+    "coaching_points": "Hạ thấp vai và lắc hông theo chân đảo để động tác giả giống thật nhất.",
+    "keywords": [
+      "`Chao chan qua nguoi`",
+      "`Stepover drill`",
+      "`Ky thuat đảo chân`",
+      "`Qua nguoi 1v1`"
+    ]
+  },
+  {
+    "id": "DRILL_038",
+    "category": "Chiến thuật",
+    "title": "NÉM BÓNG BIÊN CHUYÊN SÂU (LONG THROW-IN)",
+    "level": "Mọi trình độ | **Số người:** 2 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tăng cự ly và lực của các quả ném biên vào thẳng vòng cấm đối phương.",
+    "steps": [
+      "Đưa bóng ra sau ngửa sâu qua đầu, ngửa thân người tạo hình cánh cung.",
+      "Chạy đà ngắn, giậm hai chân sát đất (không nhấc chân) và dùng lực gập bụng + vai ném bóng đi xa.",
+      "Thực hiện 15-20 lần ném xa."
+    ],
+    "coaching_points": "Hai chân phải chạm đất hoàn toàn khi bóng rời tay, bóng phải đi từ sau đầu ra trước.",
+    "keywords": [
+      "`Nem bong bien xa`",
+      "`Long throw in`",
+      "`Ky thuat nem bien`",
+      "`Giao bong bien`"
+    ]
+  },
+  {
+    "id": "DRILL_039",
+    "category": "Chuyền & Nhận",
+    "title": "BÓNG MA 3v1 TRONG Ô HẸP (3v1 SMALL SPACE KEEP AWAY)",
+    "level": "Cơ bản - Trung bình | **Số người:** 4 người",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Rèn luyện kỹ năng chuyền bóng cực nhanh và chịu áp lực trong diện tích rất hẹp.",
+    "steps": [
+      "Giới hạn 1 chạm cho 3 người kiểm soát bóng.",
+      "Nếu bị cắt bóng hoặc làm bóng ra ngoài, người chuyền sai lập tức vào thế chỗ."
+    ],
+    "coaching_points": "Chân luôn ở tư thế nhún nhảy di chuyển, không đứng chết chân chờ bóng.",
+    "keywords": [
+      "`Bong ma 3v1`",
+      "`Keepaway 3v1`",
+      "`Rondo o hep`",
+      "`Phối hợp 3 người`"
+    ]
+  },
+  {
+    "id": "DRILL_040",
+    "category": "Dứt điểm",
+    "title": "DỨT ĐIỂM BẰNG ĐẦU BỒNG CÂU (LOB / CHIP SHOT)",
+    "level": "Nâng cao | **Số người:** 2 người (Cầu thủ + Thủ môn)",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tận dụng thời điểm thủ môn dâng cao để bấm bóng qua đầu vào lưới.",
+    "steps": [
+      "Thủ môn chủ động dâng cao khép góc.",
+      "Cầu thủ dùng mũi giày xục thẳng vào đáy quả bóng để tạo đường cong bổng ngắn qua đầu thủ môn.",
+      "Thực hiện 10 lần."
+    ],
+    "coaching_points": "Khóa nhẹ cổ chân nhịp cuối, vung chân ngắn không cần đà quá mạnh.",
+    "keywords": [
+      "`Sut bieu dau bong`",
+      "`Chip shot drill`",
+      "`Sut bam bong`",
+      "`Qua dau thu mon`"
+    ]
+  },
+  {
+    "id": "DRILL_041",
+    "category": "Thể lực",
+    "title": "BỨT TỐC TỪ TƯ THẾ NẰM / NỒI (EXPLOSIVE ACCELERATION)",
+    "level": "Mọi trình độ | **Số người:** 1 - 2 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Tăng tốc độ bộc phát phản xạ từ các tư thế bất lợi.",
+    "steps": [
+      "Khi có tiếng còi/hiệu lệnh, lập tức bật đứng dậy bứt tốc 100% sức đến mốc 10m.",
+      "Đi bộ thả lỏng về vạch xuất phát.",
+      "Thực hiện 8-10 lần."
+    ],
+    "coaching_points": "Đẩy trọng tâm người về phía trước ngay khi đứng dậy để lấy đà lao đi.",
+    "keywords": [
+      "`Phan xa put toc`",
+      "`Explosive speed`",
+      "`Gia toc phan xa`",
+      "`The luc suc bat`"
+    ]
+  },
+  {
+    "id": "DRILL_042",
+    "category": "Thủ môn",
+    "title": "BẮT BÓNG BỔNG CỦA THỦ MÔN TRONG TRANH CHẤP (GOALKEEPING CATCH UNDER PRESSURE)",
+    "level": "Nâng cao | **Số người:** 3 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Giúp thủ môn tự tin ra vào làm chủ khoảng không dù bị tiền đạo đối phương tì đè.",
+    "steps": [
+      "Tiền đạo di chuyển vào va chạm nhẹ tì đè thủ môn.",
+      "Thủ môn chủ động hô to, bật nhảy nâng cao 1 đầu gối để cản đà tiền đạo và bắt dính bóng ở điểm cao nhất.",
+      "Lặp lại 10-12 lần."
+    ],
+    "coaching_points": "Mắt không rời bóng, sử dụng đầu gối nâng cao làm lá chắn bảo vệ bản thân.",
+    "keywords": [
+      "`Thu mon tranh chấp bong bong`",
+      "`GK high ball pressure`",
+      "`Va cham thu mon`",
+      "`Tat bong va tranh chap`"
+    ]
+  },
+  {
+    "id": "DRILL_043",
+    "category": "Chiến thuật",
+    "title": "ĐỔI CÁNH TẤN CÔNG BẰNG BÓNG SỆT (SWITCH PLAY GROUND PASS)",
+    "level": "Trung bình | **Số người:** 4 - 6 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Chuyển hướng tấn công sang cánh trống để thoát sự tập trung phòng ngự của đối phương.",
+    "steps": [
+      "Bất ngờ thực hiện đường chuyền sệt căng trung bình/dài sang tiền vệ hoặc hậu vệ biên phải đang dâng lên.",
+      "Biên phải nhận bóng bứt tốc tấn công không gian trống."
+    ],
+    "coaching_points": "Đường chuyền đổi cánh phải có lực căng để đối phương không kịp lùi về bọc lót.",
+    "keywords": [
+      "`Doi canh san 7`",
+      "`Switch play drill`",
+      "`Chuyen bong sang cánh`",
+      "`Trien khai bong`"
+    ]
+  },
+  {
+    "id": "DRILL_044",
+    "category": "Chuyền & Nhận",
+    "title": "THOÁT PRESSING BẰNG KỸ THUẬT ĐẬP TƯỜNG Y-DRILL (Y-SHAPE PASSING)",
+    "level": "Trung bình - Nâng cao | **Số người:** 4 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Tạo bài phối hợp thoát pressing kinh điển giữa trung vệ, tiền vệ trụ và tiền đạo.",
+    "steps": [
+      "B đập tường 1 chạm nhả lại cho A.",
+      "A tung đường chuyền dài/chọc khe lên cho C (Nhánh chữ Y trái/phải).",
+      "C di chuyển nhận bóng dứt điểm hoặc rê đi tiếp. Luân chuyển vị trí xoay vòng."
+    ],
+    "coaching_points": "Di chuyển đón bóng chủ động, nhịp nhả bóng của B phải chính xác và mềm mại.",
+    "keywords": [
+      "`Thoat pressing Y drill`",
+      "`Y shape passing`",
+      "`Chuyen dap tuong`",
+      "`Phoi hop Y drill`"
+    ]
+  },
+  {
+    "id": "DRILL_045",
+    "category": "Thể lực",
+    "title": "THẢ LỎNG VÀ CĂNG CƠ PHỤC HỒI (COOL-DOWN & STRETCHING)",
+    "level": "Mọi trình độ | **Số người:** 1 hoặc nhiều người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 10,
+    "objective": "Giảm nhịp tim từ từ, giải phóng axit lactic trong cơ bắp, ngăn ngừa căng cơ chuột rút.",
+    "steps": [
+      "Căng cơ đùi trước: Đứng 1 chân, kéo gót chân còn lại áp sát mông (giữ 15-20 giây).",
+      "Căng cơ gân kheo (đùi sau): Đặt gót chân thẳng ra trước, gập người về phía mũi chân.",
+      "Căng cơ bắp chân và cơ háng (ép dẻo ngang/dọc)."
+    ],
+    "coaching_points": "Giữ nguyên tư thế căng cơ tĩnh 15-30 giây, hít thở sâu và đều, không nhún nhảy ép cơ quá đà gây rách cơ.",
+    "keywords": [
+      "`Cang co bong da`",
+      "`Cool down stretching`",
+      "`Phuc hoi sau tran dau`",
+      "`Giam giam chấn thương`"
+    ]
+  },
+  {
+    "id": "DRILL_046",
+    "category": "Phòng thủ",
+    "title": "CẮT BÓNG VÀ DI CHUYỂN BỌC LÓT (INTERCEPTION & COVERING)",
+    "level": "Trung bình | **Số người:** 3 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Rèn tư duy đoán đường chuyền để cắt bóng và kỹ năng bọc lót khi đồng đội bị qua người.",
+    "steps": [
+      "Hậu vệ đứng ở trung lộ quan sát nhịp ra chân và hướng mắt của đối phương.",
+      "Bắt bài nhịp chuyền nhẹ hoặc thiếu quan sát để lao lên cắt bóng ngay trên không/mặt đất.",
+      "Lặp lại 12–15 lần rồi đổi vai."
+    ],
+    "coaching_points": "Không lao lên quá sớm để tránh bị vặn sườn, phán đoán dựa vào tư thế chân trụ người chuyền.",
+    "keywords": [
+      "`Cat bong hau ve`",
+      "`Boc lot phong thu`",
+      "`Interception drill`",
+      "`Doc tinh huong phong thu`"
+    ]
+  },
+  {
+    "id": "DRILL_047",
+    "category": "Dứt điểm",
+    "title": "KÉO BÓNG CHÂN TRUẬN - SÚT CHÂN NGHỊCH (WEAK FOOT FINISHING)",
+    "level": "Trung bình - Nâng cao | **Số người:** 1 - 2 người",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Cải thiện lực và độ chính xác của các cú sút bằng chân không thuận.",
+    "steps": [
+      "Dùng gầm giày hoặc má trong chân thuận kéo bóng ngang sang phía chân nghịch.",
+      "Đặt chân trụ (chân thuận) chắc chắn, vung chân nghịch dứt điểm ngay nhịp thứ hai.",
+      "Thực hiện 15-20 cú sút."
+    ],
+    "coaching_points": "Đặt chân trụ ngang bóng và hướng thẳng về góc sút, thả lỏng cổ chân nghịch khi lấy đà rồi khóa chặt lúc va chạm bóng.",
+    "keywords": [
+      "`Sut chan nghich`",
+      "`Weak foot drill`",
+      "`Chuyen va sut chan trai`",
+      "`Sut hai chan`"
+    ]
+  },
+  {
+    "id": "DRILL_048",
+    "category": "Chuyền & Nhận",
+    "title": "CHUYỀN BÓNG BẬT TƯỜNG ZIGZAG (WALL PASS ZIGZAG)",
+    "level": "Cơ bản - Trung bình | **Số người:** 1 người",
+    "intensity": "dễ",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 15,
+    "objective": "Cải thiện nhịp chạm bóng 1-2 liên tục với tường khi di chuyển ngang.",
+    "steps": [
+      "Tại mỗi mốc, chuyền bóng vào tường và di chuyển nhận bóng bật ra.",
+      "Dùng chân trái khi di chuyển sang trái, chân phải khi di chuyển sang phải.",
+      "Thực hiện 5 lượt đi và về."
+    ],
+    "coaching_points": "Luôn giữ tư thế kiễng gót chân, chuyền bóng có lực căng vừa đủ để bóng bật lại đúng tầm chạy.",
+    "keywords": [
+      "`Chuyen tuong zigzag`",
+      "`Wall pass drill`",
+      "`Co xat tuong`",
+      "`Chuyen bong khoang hep`"
+    ]
+  },
+  {
+    "id": "DRILL_049",
+    "category": "Dứt điểm",
+    "title": "ĐÈ NGƯỜI BẮT VOLLEY LÒNG TRONG (INSIDE VOLLEY CONTROL)",
+    "level": "Trung bình | **Số người:** 2 người",
+    "intensity": "trung bình",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Dứt điểm chuẩn xác từ đường bóng chuyền tầm trung bằng lòng bàn chân.",
+    "steps": [
+      "Tiền đạo di chuyển đón điểm rơi, xoay hông và mở lòng bàn chân sút bóng trực tiếp khi bóng chưa chạm đất.",
+      "Thực hiện 10 lần chân phải, 10 lần chân trái."
+    ],
+    "coaching_points": "Mở rộng hông, dùng lòng bàn chân đè lên phần giữa quả bóng để hướng bóng đi chìm hoặc vào góc hiểm.",
+    "keywords": [
+      "`Volley long trong`",
+      "`Inside volley`",
+      "`Cat bong tam trung`",
+      "`Sut no bong`"
+    ]
+  },
+  {
+    "id": "DRILL_050",
+    "category": "Chiến thuật",
+    "title": "XỬ LÝ BÓNG TRONG THẾ BỊ BẮT VIỆT VỊ (BEATING THE OFFSIED LINE)",
+    "level": "Nâng cao | **Số người:** 3 người (+ Thủ môn)",
+    "intensity": "khó",
+    "avoid_injuries": [],
+    "players_required": 1,
+    "duration_minutes": 20,
+    "objective": "Lựa chọn thời điểm bứt tốc nhịp nhàng để không rơi vào thế việt vị.",
+    "steps": [
+      "Tiền vệ cầm bóng nhấp nhử đà chuyền.",
+      "Tiền đạo giậm chân tại chỗ hoặc chạy giật lùi 1 bước, ngay khi tiền vệ ra chân chuyền chọc khe thì mới lao lên nhận bóng.",
+      "Thực hiện dứt điểm 1v1 với thủ môn."
+    ],
+    "coaching_points": "Quan sát tư thế vai của người chuyền bóng để đưa ra quyết định bứt tốc chuẩn xác tới từng miligiây.",
+    "keywords": [
+      "`Pha bay viet vi 1v1`",
+      "`Beat offside line`",
+      "`Dut diem qua nguoi`",
+      "`Tiendao b3`"
+    ]
+  }
+]
+};
+
+function norm(s){
+  return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+
+const badgeContainer=document.getElementById('type-badges');
+footballData.system_info.supported_types.forEach(t=>{
+  badgeContainer.innerHTML += `<span class="badge" onclick="filterByCategory('${t}')">${t}</span>`;
+});
+badgeContainer.innerHTML += `<span class="badge" style="background:#16a34a" onclick="filterByCategory('all')">Hiển thị tất cả</span>`;
+
+function renderGrid(drills){
+  const grid=document.getElementById('drills-grid');
+  document.getElementById('countStat').textContent=`${drills.length} bài tập đang hiển thị`;
+  if(!drills.length){grid.innerHTML='<div class="empty">⚽ Không tìm thấy bài tập phù hợp.<br>Thử từ khóa khác hoặc bấm <b>Hiển thị tất cả</b>.</div>';return;}
+  grid.innerHTML=drills.map(d=>`
+    <div class="card">
+      <div>
+        <div class="card-header"><span class="drill-id">${escapeHtml(d.id)} | ${escapeHtml(d.category)}</span><span class="drill-level">${escapeHtml(d.level)}</span></div>
+        <h3 class="drill-title">${escapeHtml(d.title)}</h3>
+        <div class="meta-info">⏱️ ${d.duration_minutes} phút &nbsp;|&nbsp; 👥 ${d.players_required} người</div>
+        <p class="objective"><b>🎯 Mục tiêu:</b> ${escapeHtml(d.objective)}</p>
+        <b style="font-size:13px">Các bước thực hiện:</b>
+        <ol class="steps-list">${d.steps.map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ol>
+      </div>
+      <div class="coaching-tip">💡 <b>Lưu ý HLV:</b> ${escapeHtml(d.coaching_points)}</div>
+      <div class="card-actions">
+        <button onclick="openDrill('${escapeHtml(d.id)}')">👁 Xem chi tiết</button>
+        <button id="fav-${escapeHtml(d.id)}" class="fav-btn ${favoriteSet.has(d.id)?'active':''}" onclick="toggleFavorite('${escapeHtml(d.id)}')">${favoriteSet.has(d.id)?'♥ Đã lưu':'♡ Yêu thích'}</button>
+      </div>
+    </div>`).join('');
+  updateStats(drills);
+}
+
+renderGrid(footballData.drills);
+
+function filterByCategory(category){
+  const filtered=category==='all'?footballData.drills:footballData.drills.filter(d=>d.category===category);
+  renderGrid(filtered);
+  if(category!=='all') addMessage(`Đã lọc nhóm <b>${escapeHtml(category)}</b>: <b>${filtered.length}</b> bài tập.`,'bot');
+}
+function toggleChat(){document.getElementById('chatBox').classList.toggle('active')}
+function handleKeyPress(e){if(e.key==='Enter')sendMessage()}
+
+
+function applySmartFilter(){
+  const level=document.getElementById('levelSelect').value;
+  const injury=document.getElementById('injurySelect').value;
+  const daysVal=document.getElementById('daysInput').value;
+  const days=daysVal!==""?parseInt(daysVal):null;
+  let filtered=footballData.drills.filter(d=>{
+    if(level!=="all" && !norm(d.level).includes(norm(level))) return false;
+    if(injury!=="none" && (d.avoid_injuries||[]).includes(injury)) return false;
+    if(days!==null && days<=3 && (d.level==="Nâng cao" || d.intensity==="khó")) return false;
+    return true;
+  });
+  let reply=`📋 <b>Kết quả lọc:</b> tìm thấy <b>${filtered.length}</b> bài tập.`;
+  if(days!==null && days<=3) reply+=`<br>⚠️ Còn ${days} ngày: đã loại bài <b>Nâng cao/khó</b> theo quy tắc giữ sức.`;
+  if(injury!=="none") reply+=`<br>🩹 Các bài có đánh dấu vùng chấn thương đã được loại.`;
+  addMessage(reply,'bot'); renderGrid(filtered);
+}
+
+async function sendMessage(){
+  const input=document.getElementById('userInput');
+  const raw=input.value.trim();
+  if(!raw) return;
+
+  // Hiển thị tin nhắn người dùng
+  addMessage(escapeHtml(raw),'user');
+  input.value='';
+
+  // Hiển thị trạng thái đang suy nghĩ
+  const loadingId='ai-loading-'+Date.now();
+  addMessage(`<span id="${loadingId}">🤖 Đang suy nghĩ...</span>`,'bot');
+
+  try{
+    const response=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:raw})
+    });
+
+    let data={};
+    try{
+      data=await response.json();
+    }catch(parseError){
+      data={error:'Máy chủ trả về dữ liệu không hợp lệ.'};
+    }
+
+    const loading=document.getElementById(loadingId);
+    if(loading && loading.parentElement) loading.parentElement.remove();
+
+    if(response.ok && data.reply){
+      addMessage(escapeHtml(data.reply).replace(/\n/g,'<br>'),'bot');
+    }else{
+      const detail=data.detail ? `<br><small>${escapeHtml(data.detail)}</small>` : '';
+      addMessage(`❌ ${escapeHtml(data.error || 'Gemini không trả lời được.')} ${detail}`,'bot');
+    }
+  }catch(error){
+    const loading=document.getElementById(loadingId);
+    if(loading && loading.parentElement) loading.parentElement.remove();
+
+    addMessage('❌ Không thể kết nối tới Football AI Coach. Hãy kiểm tra Flask đang chạy ở cổng 5000.','bot');
+    console.error('Chat error:',error);
+  }
+}
+function addMessage(text,sender){
+  const div=document.createElement('div');div.className=`msg ${sender}`;div.innerHTML=text;
+  const c=document.getElementById('chatMessages');c.appendChild(div);c.scrollTop=c.scrollHeight;
+}
+
+        const favoriteSet = new Set(JSON.parse(localStorage.getItem('footballFavorites') || '[]'));
+
+        function updateStats(drills) {
+            document.getElementById('statTotal').innerText = footballData.drills.length;
+            document.getElementById('statVisible').innerText = drills.length;
+            document.getElementById('statAdvanced').innerText = drills.filter(d=>d.level==='Nâng cao').length;
+            document.getElementById('statTime').innerText = drills.reduce((s,d)=>s+d.duration_minutes,0);
+        }
+
+        function toggleFavorite(id){
+            if(favoriteSet.has(id)) favoriteSet.delete(id); else favoriteSet.add(id);
+            localStorage.setItem('footballFavorites', JSON.stringify([...favoriteSet]));
+            const b=document.getElementById('fav-'+id);
+            if(b){b.classList.toggle('active',favoriteSet.has(id));b.innerText=favoriteSet.has(id)?'♥ Đã lưu':'♡ Yêu thích';}
+        }
+
+        function openDrill(id){
+            const d=footballData.drills.find(x=>x.id===id); if(!d)return;
+            document.getElementById('modalContent').innerHTML=`
+              <span class="drill-id">${d.id} · ${d.category}</span>
+              <h2>${d.title}</h2>
+              <p><b>🎯 Mục tiêu:</b> ${d.objective}</p>
+              <p><b>📊 Cấp độ:</b> ${d.level} &nbsp; <b>🔥 Cường độ:</b> ${d.intensity}</p>
+              <p><b>👥 Số người:</b> ${d.players_required} &nbsp; <b>⏱️ Thời lượng:</b> ${d.duration_minutes} phút</p>
+              <div class="pitch"><div style="position:absolute;left:20%;top:45%;font-size:28px">⚽</div><div style="position:absolute;right:18%;top:38%;font-size:22px">●</div><div style="position:absolute;left:45%;top:20%;font-size:22px">●</div></div>
+              <h3>📋 Các bước thực hiện</h3>
+              <ol>${d.steps.map(s=>`<li style="margin:8px 0">${escapeHtml(s)}</li>`).join('')}</ol>
+              <div class="coaching-tip">💡 <b>Lưu ý HLV:</b> ${escapeHtml(d.coaching_points)}</div>
+            `;
+            document.getElementById('drillModal').classList.add('show');
+        }
+        function closeModal(e){ if(e.target.id==='drillModal') e.target.classList.remove('show'); }
+
+        function quickSearch(q){
+            document.getElementById('userInput').value=q;
+            sendMessage();
+            const grid=document.getElementById('drills-grid');
+            if(grid) window.scrollTo({top:grid.offsetTop-20,behavior:'smooth'});
+        }
+        function resetAll(){
+            renderGrid(footballData.drills);
+            document.getElementById('userInput').value='';
+            document.getElementById('levelSelect').value='all';
+            document.getElementById('injurySelect').value='none';
+            document.getElementById('daysInput').value='';
+        }
+
+        function generatePlan(){
+            const players=parseInt(document.getElementById('planPlayers').value)||12;
+            const total=parseInt(document.getElementById('planDuration').value);
+            const goal=document.getElementById('planGoal').value;
+            const days=parseInt(document.getElementById('planDays').value);
+            let pool=footballData.drills.filter(d=>goal==='all'||d.category===goal||d.title.toLowerCase().includes(goal.toLowerCase()));
+            if(days<=2) pool=pool.filter(d=>d.level!=='Nâng cao'&&d.intensity!=='khó');
+            if(!pool.length) pool=footballData.drills.filter(d=>d.level==='Cơ bản');
+            const warm=pool.find(d=>d.category==='Kiểm soát bóng')||pool[0];
+            const main=pool[Math.min(1,pool.length-1)]||pool[0];
+            const finish=pool.find(d=>d.category==='Dứt điểm')||pool[pool.length-1];
+            const tactical=pool.find(d=>d.category==='Chiến thuật')||pool[Math.min(2,pool.length-1)]||pool[0];
+            let blocks=[warm,main,finish,tactical].filter((d,i,a)=>a.findIndex(x=>x.id===d.id)===i);
+            const labels=['Khởi động kỹ thuật','Nội dung chính','Dứt điểm / chuyển hóa','Chiến thuật'];
+            const base=Math.floor(total/blocks.length);
+            document.getElementById('planResult').innerHTML=
+              `<b>👥 ${players} cầu thủ · ⏱ ${total} phút · ${days<=2?'Giảm tải trước trận':'Cường độ phù hợp giai đoạn'}</b>`+
+              blocks.map((d,i)=>`<div class="plan-item"><b>${labels[i]} — ${base} phút</b><br>⚽ ${d.title} · ${d.level}</div>`).join('');
+        }
+
+        function buildWeek(){
+            const names=['T2','T3','T4','T5','T6','T7','CN'];
+            const texts=['Kỹ thuật','Pressing','Nghỉ / hồi phục','Dứt điểm','Chiến thuật','Giảm tải','MATCH DAY'];
+            document.getElementById('weekGrid').innerHTML=names.map((n,i)=>`<div class="day"><b>${n}</b>${texts[i]}</div>`).join('');
+        }
+        buildWeek();
+
+</script>
+</body>
+</html>
