@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -1398,6 +1398,8 @@ function norm(s){
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 
+const favoriteSet = new Set(JSON.parse(localStorage.getItem('footballFavorites') || '[]'));
+
 const badgeContainer=document.getElementById('type-badges');
 footballData.system_info.supported_types.forEach(t=>{
   badgeContainer.innerHTML += `<span class="badge" onclick="filterByCategory('${t}')">${t}</span>`;
@@ -1407,7 +1409,7 @@ badgeContainer.innerHTML += `<span class="badge" style="background:#16a34a" oncl
 function renderGrid(drills){
   const grid=document.getElementById('drills-grid');
   document.getElementById('countStat').textContent=`${drills.length} bài tập đang hiển thị`;
-  if(!drills.length){grid.innerHTML='<div class="empty">⚽ Không tìm thấy bài tập phù hợp.<br>Thử từ khóa khác hoặc bấm <b>Hiển thị tất cả</b>.</div>';return;}
+  if(!drills.length){grid.innerHTML='<div class="empty">⚽ Không tìm thấy bài tập phù hợp.<br>Thử từ khóa khác hoặc bấm <b>Hiển thị tất cả</b>.</div>';updateStats([]);return;}
   grid.innerHTML=drills.map(d=>`
     <div class="card">
       <div>
@@ -1504,7 +1506,6 @@ function addMessage(text,sender){
   const c=document.getElementById('chatMessages');c.appendChild(div);c.scrollTop=c.scrollHeight;
 }
 
-        const favoriteSet = new Set(JSON.parse(localStorage.getItem('footballFavorites') || '[]'));
 
         function updateStats(drills) {
             document.getElementById('statTotal').innerText = footballData.drills.length;
@@ -1581,4 +1582,5 @@ function addMessage(text,sender){
 </script>
 </body>
 </html>
+
 
