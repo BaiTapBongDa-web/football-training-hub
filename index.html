@@ -273,6 +273,7 @@ mark{background:#facc15;color:#111827;padding:0 2px;border-radius:2px}
 </div>
 
 <script>
+let aiRequestRunning = false;
 const footballData = {
   system_info:{domain:"Huấn luyện bóng đá",supported_types:["Kiểm soát bóng","Chuyền & Nhận","Dứt điểm","Thủ môn","Phòng thủ","Thể lực","Chiến thuật"]},
   drills:[
@@ -1458,45 +1459,238 @@ function applySmartFilter(){
 }
 
 async function sendMessage(){
-  const input=document.getElementById('userInput');
-  const raw=input.value.trim();
-  if(!raw) return;
 
-  // Hiển thị tin nhắn người dùng
-  addMessage(escapeHtml(raw),'user');
-  input.value='';
+    if(aiRequestRunning){
+        return;
+    }
 
-  // Hiển thị trạng thái đang suy nghĩ
-  const loadingId='ai-loading-'+Date.now();
-  addMessage(`<span id="${loadingId}">🤖 Đang suy nghĩ...</span>`,'bot');
+    const input = document.getElementById('userInput');
 
-  try{
-    const response=await fetch('/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:raw})
-    });
+    const sendButton =
+        document.querySelector('.chat-input-area button');
 
-    let data={};
+    const raw = input.value.trim();
+
+    if(!raw){
+        return;
+    }
+
+
+    // =========================================
+    // KHÓA REQUEST
+    // =========================================
+
+    aiRequestRunning = true;
+
+    if(sendButton){
+        sendButton.disabled = true;
+        sendButton.textContent = '...';
+    }
+
+
+    // =========================================
+    // HIỂN THỊ USER
+    // =========================================
+
+    addMessage(
+        escapeHtml(raw),
+        'user'
+    );
+
+    input.value = '';
+
+
+    // =========================================
+    // LOADING
+    // =========================================
+
+    const loadingId =
+        'ai-loading-' + Date.now();
+
+    addMessage(
+        `<span id="${loadingId}">
+            🤖 Đang suy nghĩ...
+        </span>`,
+        'bot'
+    );
+
+
     try{
-      data=await response.json();
-    }catch(parseError){
-      data={error:'Máy chủ trả về dữ liệu không hợp lệ.'};
+
+        const response = await fetch(
+            '/api/chat',
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+
+                body: JSON.stringify({
+                    message: raw
+                })
+            }
+        );
+
+
+        let data = {};
+
+        try{
+
+            data = await response.json();
+
+        }catch(parseError){
+
+            data = {
+                error:
+                    'Máy chủ trả về dữ liệu không hợp lệ.'
+            };
+        }
+
+
+        // =========================================
+        // XÓA LOADING
+        // =========================================
+
+        const loading =
+            document.getElementById(
+                loadingId
+            );
+
+        if(
+            loading &&
+            loading.parentElement
+        ){
+
+            loading.parentElement.remove();
+
+        }
+
+
+        // =========================================
+        // THÀNH CÔNG
+        // =========================================
+
+        if(
+            response.ok &&
+            data.reply
+        ){
+
+            addMessage(
+                escapeHtml(data.reply)
+                    .replace(/\n/g, '<br>'),
+                'bot'
+            );
+
+            return;
+        }
+
+
+        // =========================================
+        // 429
+        // =========================================
+
+        if(response.status === 429){
+
+            addMessage(
+                '⏳ Gemini đang giới hạn số lượt gọi. ' +
+                'Hệ thống đã tự xử lý retry. ' +
+                'Bạn chờ một chút rồi thử lại nhé.',
+                'bot'
+            );
+
+            return;
+        }
+
+
+        // =========================================
+        // 503
+        // =========================================
+
+        if(response.status === 503){
+
+            addMessage(
+                '🔄 Gemini đang tạm thời quá tải. ' +
+                'Hệ thống đã thử kết nối lại. ' +
+                'Bạn thử lại sau một chút nhé.',
+                'bot'
+            );
+
+            return;
+        }
+
+
+        // =========================================
+        // LỖI KHÁC
+        // =========================================
+
+        const detail =
+            data.detail
+                ? `<br><small>
+                    ${escapeHtml(data.detail)}
+                   </small>`
+                : '';
+
+
+        addMessage(
+            `❌ ${
+                escapeHtml(
+                    data.error ||
+                    'Gemini không trả lời được.'
+                )
+            }${detail}`,
+            'bot'
+        );
+
+
+    }catch(error){
+
+        const loading =
+            document.getElementById(
+                loadingId
+            );
+
+        if(
+            loading &&
+            loading.parentElement
+        ){
+
+            loading.parentElement.remove();
+
+        }
+
+
+        addMessage(
+            '❌ Không kết nối được máy chủ. ' +
+            'Kiểm tra mạng hoặc thử lại sau.',
+            'bot'
+        );
+
+
+        console.error(
+            'Chat error:',
+            error
+        );
+
+
+    }finally{
+
+        // =========================================
+        // MỞ KHÓA
+        // =========================================
+
+        aiRequestRunning = false;
+
+        if(sendButton){
+
+            sendButton.disabled = false;
+            sendButton.textContent = 'Gửi';
+
+        }
+
     }
-
-    const loading=document.getElementById(loadingId);
-    if(loading && loading.parentElement) loading.parentElement.remove();
-
-    if(response.ok && data.reply){
-      addMessage(escapeHtml(data.reply).replace(/\n/g,'<br>'),'bot');
-    }else{
-      const detail=data.detail ? `<br><small>${escapeHtml(data.detail)}</small>` : '';
-      addMessage(`❌ ${escapeHtml(data.error || 'Gemini không trả lời được.')} ${detail}`,'bot');
-    }
-  }catch(error){
-    const loading=document.getElementById(loadingId);
-    if(loading && loading.parentElement) loading.parentElement.remove();
-
+}
     addMessage('❌ Không thể kết nối tới Football AI Coach. Hãy kiểm tra Flask đang chạy ở cổng 5000.','bot');
     console.error('Chat error:',error);
   }
